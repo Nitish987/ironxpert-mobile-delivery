@@ -22,7 +22,7 @@ import com.google.firebase.auth.PhoneAuthOptions;
 import com.google.firebase.auth.PhoneAuthProvider;
 import com.ironxpert.delivery.common.auth.Auth;
 import com.ironxpert.delivery.common.db.Database;
-import com.ironxpert.delivery.models.User;
+import com.ironxpert.delivery.models.DeliveryUser;
 import com.ironxpert.delivery.utils.Promise;
 import com.ironxpert.delivery.utils.Validator;
 
@@ -174,8 +174,8 @@ public class LoginVerificationActivity extends AppCompatActivity {
 
                             @Override
                             public void resolved(Object o) {
-                                Database.getInstance().collection("user").document(user.getUid()).get().addOnSuccessListener(documentSnapshot -> {
-                                    User u = documentSnapshot.toObject(User.class);
+                                Database.getInstance().collection("delivery").document(user.getUid()).get().addOnSuccessListener(documentSnapshot -> {
+                                    DeliveryUser u = documentSnapshot.toObject(DeliveryUser.class);
                                     if (u.getName() == null || u.getEmail() == null || u.getPhone() == null) {
                                         Intent intent = new Intent(getApplicationContext(), AccountDetailsActivity.class);
                                         intent.putExtra("USER", u);

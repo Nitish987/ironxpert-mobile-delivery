@@ -79,7 +79,7 @@ public class MyPhotoActivity extends AppCompatActivity {
                 changePhotoBtn.setVisibility(View.INVISIBLE);
                 StorageReference storageReference = reference.child("profile").child(Objects.requireNonNull(Auth.getAuthUserUid()));
                 storageReference.putFile(Uri.parse(photo)).addOnSuccessListener(taskSnapshot -> storageReference.getDownloadUrl().addOnSuccessListener(uri -> {
-                    Database.getInstance().collection("user").document(Auth.getAuthUserUid()).update("photo", uri.toString()).addOnSuccessListener(unused -> {
+                    Database.getInstance().collection("delivery").document(Auth.getAuthUserUid()).update("photo", uri.toString()).addOnSuccessListener(unused -> {
                         Toast.makeText(this, "Profile pic updated.", Toast.LENGTH_SHORT).show();
                         finish();
                     }).addOnFailureListener(e -> {

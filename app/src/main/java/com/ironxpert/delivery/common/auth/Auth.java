@@ -6,10 +6,11 @@ import com.android.volley.Request;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.ironxpert.delivery.common.db.Database;
+import com.ironxpert.delivery.common.db.LaunderingService;
 import com.ironxpert.delivery.common.security.AES128;
 import com.ironxpert.delivery.common.settings.ApiKey;
 import com.google.firebase.auth.FirebaseAuth;
-import com.ironxpert.delivery.models.User;
+import com.ironxpert.delivery.models.DeliveryUser;
 import com.ironxpert.delivery.utils.Promise;
 import com.ironxpert.delivery.utils.Server;
 
@@ -62,19 +63,21 @@ public class Auth {
     public static class Signup {
         public static void signup(FirebaseUser user, Promise<Object> promise) {
             promise.resolving(0, null);
-            Database.getInstance().collection("user").document(user.getUid()).get().addOnSuccessListener(documentSnapshot -> {
+            Database.getInstance().collection("delivery").document(user.getUid()).get().addOnSuccessListener(documentSnapshot -> {
                 if (documentSnapshot.exists()) {
                     promise.resolved(null);
                 } else {
-                    User newUser = new User(
+                    DeliveryUser newDeliveryUser = new DeliveryUser(
+                            true,
                             user.getEmail(),
                             null,
                             user.getDisplayName(),
                             user.getPhoneNumber(),
                             null,
+                            LaunderingService.SHOP,
                             user.getUid()
                     );
-                    Database.getInstance().collection("user").document(user.getUid()).set(newUser).addOnSuccessListener(unused -> promise.resolved(null)).addOnFailureListener(e -> promise.reject(null));
+                    Database.getInstance().collection("delivery").document(user.getUid()).set(newDeliveryUser).addOnSuccessListener(unused -> promise.resolved(null)).addOnFailureListener(e -> promise.reject(null));
                 }
             }).addOnFailureListener(e -> promise.reject(null));
         }
@@ -83,7 +86,7 @@ public class Auth {
     public static class Login {
         public static void login(Context context, FirebaseUser user, Promise<Object> promise) {
             promise.resolving(0, null);
-            Database.getInstance().collection("user").document(user.getUid()).get().addOnSuccessListener(documentSnapshot -> {
+            Database.getInstance().collection("delivery").document(user.getUid()).get().addOnSuccessListener(documentSnapshot -> {
                 if (documentSnapshot.exists()) {
                     Database.getInstance().collection("app").document("account").get().addOnSuccessListener(snap -> {
                         String encKey = AES128.decrypt(AES128.NATIVE_ENCRYPTION_KEY, snap.get("sharedEncKey", String.class));
@@ -105,7 +108,7 @@ public class Auth {
         public static void updateMessageToken(String uid, String token) {
             Map<String, Object> map = new HashMap<>();
             map.put("msgToken", token);
-            Database.getInstance().collection("user").document(uid).update(map);
+            Database.getInstance().collection("delivery").document(uid).update(map);
         }
     }
 

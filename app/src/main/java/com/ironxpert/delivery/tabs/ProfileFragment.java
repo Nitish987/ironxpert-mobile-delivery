@@ -21,7 +21,7 @@ import com.ironxpert.delivery.MyPhotoActivity;
 import com.ironxpert.delivery.R;
 import com.ironxpert.delivery.common.auth.Auth;
 import com.ironxpert.delivery.common.auth.AuthPreferences;
-import com.ironxpert.delivery.models.User;
+import com.ironxpert.delivery.models.DeliveryUser;
 
 import java.util.Objects;
 
@@ -54,13 +54,13 @@ public class ProfileFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        FirebaseFirestore.getInstance().collection("user").document(Objects.requireNonNull(Auth.getAuthUserUid())).get().addOnSuccessListener(documentSnapshot -> {
-            User user = documentSnapshot.toObject(User.class);
+        FirebaseFirestore.getInstance().collection("delivery").document(Objects.requireNonNull(Auth.getAuthUserUid())).get().addOnSuccessListener(documentSnapshot -> {
+            DeliveryUser deliveryUser = documentSnapshot.toObject(DeliveryUser.class);
 
-            assert user != null;
-            myNameTxt.setText(user.getName());
-            emailTxt.setText(user.getEmail());
-            if (user.getPhoto() != null) {
+            assert deliveryUser != null;
+            myNameTxt.setText(deliveryUser.getName());
+            emailTxt.setText(deliveryUser.getEmail());
+            if (deliveryUser.getPhoto() != null) {
                 photo = documentSnapshot.get("photo", String.class);
                 Glide.with(view.getContext()).load(photo).into(myPhoto);
             }

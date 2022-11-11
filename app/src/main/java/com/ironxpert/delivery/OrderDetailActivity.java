@@ -35,7 +35,6 @@ import com.ironxpert.delivery.common.security.AES128;
 import com.ironxpert.delivery.models.CartItem;
 import com.ironxpert.delivery.models.CheckoutCartItem;
 import com.ironxpert.delivery.models.Order;
-import com.ironxpert.delivery.models.Topping;
 import com.ironxpert.delivery.utils.DateParser;
 import com.ironxpert.delivery.utils.Promise;
 import com.ironxpert.delivery.utils.Validator;
@@ -52,7 +51,7 @@ public class OrderDetailActivity extends AppCompatActivity implements LocationLi
     private TextView itemsTxt, orderNumberTxt, totalCartPriceTxt, deliveryCartPriceTxt, totalPayableTxt, nameTxt, phoneTxt, addressTxt, agentNameTxt, agentPhoneTxt, timeTxt, paymentMethodTxt;
     private AppCompatButton confirmDeliveryBtn, trackOnMapBtn;
     private LinearProgressIndicator orderStateIndicator;
-    private TextView orderedStateTxt, orderedState, cookingState, dispatchedState, onWayState, deliveredState;
+    private TextView orderedStateTxt, orderedState, laundryInProgressState, dispatchedState, onWayState, deliveredState;
     private SwitchMaterial dispatchedSwitch;
     private LinearLayout deliveryCodeDesk;
     private EditText deliveryCode_eTxt;
@@ -87,7 +86,7 @@ public class OrderDetailActivity extends AppCompatActivity implements LocationLi
         orderStateIndicator = findViewById(R.id.order_state_indicator);
         orderedStateTxt = findViewById(R.id.order_state_text);
         orderedState = findViewById(R.id.ordered_state);
-        cookingState = findViewById(R.id.cooking_state);
+        laundryInProgressState = findViewById(R.id.laundry_in_progress_state);
         dispatchedState = findViewById(R.id.dispatched_state);
         onWayState = findViewById(R.id.on_way_state);
         deliveredState = findViewById(R.id.delivered_state);
@@ -160,7 +159,7 @@ public class OrderDetailActivity extends AppCompatActivity implements LocationLi
                 switch (order.getOrderState()) {
                     case 0:
                         orderStateIndicator.setProgressCompat(0, true);
-                        orderedState.getBackground().setTint(getColor(R.color.red));
+                        orderedState.getBackground().setTint(getColor(R.color.blue));
 
                         deliveryCodeDesk.setVisibility(View.GONE);
 
@@ -170,8 +169,8 @@ public class OrderDetailActivity extends AppCompatActivity implements LocationLi
 
                     case 1:
                         orderStateIndicator.setProgressCompat(25, true);
-                        orderedState.getBackground().setTint(getColor(R.color.red));
-                        cookingState.getBackground().setTint(getColor(R.color.red));
+                        orderedState.getBackground().setTint(getColor(R.color.blue));
+                        laundryInProgressState.getBackground().setTint(getColor(R.color.blue));
 
                         deliveryCodeDesk.setVisibility(View.GONE);
 
@@ -181,9 +180,9 @@ public class OrderDetailActivity extends AppCompatActivity implements LocationLi
 
                     case 2:
                         orderStateIndicator.setProgressCompat(50, true);
-                        orderedState.getBackground().setTint(getColor(R.color.red));
-                        cookingState.getBackground().setTint(getColor(R.color.red));
-                        dispatchedState.getBackground().setTint(getColor(R.color.red));
+                        orderedState.getBackground().setTint(getColor(R.color.blue));
+                        laundryInProgressState.getBackground().setTint(getColor(R.color.blue));
+                        dispatchedState.getBackground().setTint(getColor(R.color.blue));
 
                         dispatchedSwitch.setOnCheckedChangeListener(null);
                         dispatchedSwitch.setChecked(true);
@@ -196,10 +195,10 @@ public class OrderDetailActivity extends AppCompatActivity implements LocationLi
 
                     case 3:
                         orderStateIndicator.setProgressCompat(75, true);
-                        orderedState.getBackground().setTint(getColor(R.color.red));
-                        cookingState.getBackground().setTint(getColor(R.color.red));
-                        dispatchedState.getBackground().setTint(getColor(R.color.red));
-                        onWayState.getBackground().setTint(getColor(R.color.red));
+                        orderedState.getBackground().setTint(getColor(R.color.blue));
+                        laundryInProgressState.getBackground().setTint(getColor(R.color.blue));
+                        dispatchedState.getBackground().setTint(getColor(R.color.blue));
+                        onWayState.getBackground().setTint(getColor(R.color.blue));
 
                         dispatchedSwitch.setOnCheckedChangeListener(null);
                         dispatchedSwitch.setChecked(true);
@@ -212,11 +211,11 @@ public class OrderDetailActivity extends AppCompatActivity implements LocationLi
 
                     case 4:
                         orderStateIndicator.setProgressCompat(100, true);
-                        orderedState.getBackground().setTint(getColor(R.color.red));
-                        cookingState.getBackground().setTint(getColor(R.color.red));
-                        dispatchedState.getBackground().setTint(getColor(R.color.red));
-                        onWayState.getBackground().setTint(getColor(R.color.red));
-                        deliveredState.getBackground().setTint(getColor(R.color.red));
+                        orderedState.getBackground().setTint(getColor(R.color.blue));
+                        laundryInProgressState.getBackground().setTint(getColor(R.color.blue));
+                        dispatchedState.getBackground().setTint(getColor(R.color.blue));
+                        onWayState.getBackground().setTint(getColor(R.color.blue));
+                        deliveredState.getBackground().setTint(getColor(R.color.blue));
 
                         dispatchedSwitch.setOnCheckedChangeListener(null);
                         dispatchedSwitch.setEnabled(false);
@@ -339,16 +338,8 @@ public class OrderDetailActivity extends AppCompatActivity implements LocationLi
     private List<CheckoutCartItem> createOrderItemList(List<CartItem> items) {
         List<CheckoutCartItem> checkoutCartItems = new ArrayList<>();
         for (CartItem cartItem : items) {
-            StringBuilder orderName = new StringBuilder();
-            orderName.append(cartItem.getFood_data().getName()).append("(").append(cartItem.getQuantity()).append(")");
-            if (!cartItem.getTopping_ids().equals("None")) {
-                orderName.append(" + Toppings(");
-                for (Topping topping : cartItem.getToppings()) {
-                    orderName.append(topping.getName()).append(", ");
-                }
-                orderName.replace(orderName.length() - 2, orderName.length(), ")");
-            }
-            CheckoutCartItem item = new CheckoutCartItem(orderName.toString(), cartItem.getTotal_price());
+            String orderName = cartItem.getServiceItem().getName() + " (" + cartItem.getQuantity() + ")";
+            CheckoutCartItem item = new CheckoutCartItem(orderName, cartItem.getTotalPrice());
             checkoutCartItems.add(item);
         }
         return checkoutCartItems;
@@ -356,18 +347,12 @@ public class OrderDetailActivity extends AppCompatActivity implements LocationLi
 
     private String getOrderStateTxt(int state) {
         switch (state) {
-            case 0:
-                return "Ordered...";
-            case 1:
-                return "Cooking...";
-            case 2:
-                return "Dispatched...";
-            case 3:
-                return "On way...";
-            case 4:
-                return "Delivered...";
-            default:
-                return "";
+            case 0: return  "Ordered...";
+            case 1: return  "Laundry in progress...";
+            case 2: return  "Dispatched...";
+            case 3: return  "On way...";
+            case 4: return  "Delivered...";
+            default: return "";
         }
     }
 
