@@ -9,7 +9,7 @@
     <string name="email">Email</string>
     <string name="password">Password</string>
     <string name="forget_password">Forget Password</string>
-    <string name="login">Login</string>
+    <string name="login">Delivery Login</string>
     <string name="terms_privacy">Terms | Privacy</string>
     <string name="by_signing_up_you_re_agree_to_our_terms_conditions_and_privacy_policy"><![CDATA[By Sign in/Login, You\'re agree to our Terms & conditions and Privacy policy.]]></string>
     <string name="account_recovery">Account Recovery</string>

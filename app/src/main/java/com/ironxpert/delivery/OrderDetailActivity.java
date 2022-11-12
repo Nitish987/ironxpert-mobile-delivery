@@ -132,7 +132,7 @@ public class OrderDetailActivity extends AppCompatActivity implements LocationLi
                 String tp_ = "\u20B9 " + order.getPayablePrice();
                 totalPayableTxt.setText(tp_);
 
-                String c_ = order.getItems().size() + " Food Items";
+                String c_ = order.getItems().size() + " Laundry Items";
                 itemsTxt.setText(c_);
 
                 String o_ = "#~order~" + order.getOrderNumber();
@@ -261,7 +261,7 @@ public class OrderDetailActivity extends AppCompatActivity implements LocationLi
             Map<String, Object> map = new HashMap<>();
             map.put("orderState", orderState);
             FirebaseFirestore.getInstance().collection("orders").document(orderId).update(map).addOnSuccessListener(unused -> {
-                Auth.Notify.pushNotification(this, to, "Order Dispatched", "Your Order is dispatched.", new Promise<String>() {
+                Auth.Notify.pushNotification(this, to, "Order Dispatched", "Your Order is dispatched.", "customer", new Promise<String>() {
                     @Override
                     public void resolving(int progress, String msg) {}
 
@@ -288,8 +288,23 @@ public class OrderDetailActivity extends AppCompatActivity implements LocationLi
             Map<String, Object> map = new HashMap<>();
             map.put("orderState", 3);
             FirebaseFirestore.getInstance().collection("orders").document(orderId).update(map).addOnSuccessListener(unused -> {
-                Intent intent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse("google.navigation:q=" + geoPoint.getLatitude() + "," + geoPoint.getLongitude()));
-                startActivity(intent);
+                Auth.Notify.pushNotification(this, to, "Order on way", "Your Order package is on way.", "customer", new Promise<String>() {
+                    @Override
+                    public void resolving(int progress, String msg) {
+                    }
+
+                    @Override
+                    public void resolved(String o) {
+                        Intent intent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse("google.navigation:q=" + geoPoint.getLatitude() + "," + geoPoint.getLongitude()));
+                        startActivity(intent);
+                    }
+
+                    @Override
+                    public void reject(String err) {
+                        Intent intent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse("google.navigation:q=" + geoPoint.getLatitude() + "," + geoPoint.getLongitude()));
+                        startActivity(intent);
+                    }
+                });
             }).addOnFailureListener(e -> Toast.makeText(this, "Unable to track.", Toast.LENGTH_SHORT).show());
         });
 
@@ -310,7 +325,7 @@ public class OrderDetailActivity extends AppCompatActivity implements LocationLi
                         map.put("orderState", 4);
                         map.put("agentLocation", new GeoPoint(0,0));
                         reference.update(map).addOnSuccessListener(unused -> {
-                            Auth.Notify.pushNotification(this, to, "Order Delivered", "Your Order is delivered.", new Promise<String>() {
+                            Auth.Notify.pushNotification(this, to, "Order Delivered", "Your Order is delivered.", "customer", new Promise<String>() {
                                 @Override
                                 public void resolving(int progress, String msg) {
                                 }

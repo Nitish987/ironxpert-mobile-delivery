@@ -25,6 +25,7 @@ public class Database {
         headers.put("RAK", ApiKey.REQUEST_API_KEY);
         headers.put("AT", Auth.AUTH_TOKEN);
         headers.put("UID", Auth.getAuthUserUid());
+        headers.put("MYTYPE", "delivery");
 
         JSONObject body = new JSONObject();
         try {
